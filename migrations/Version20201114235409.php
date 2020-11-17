@@ -19,12 +19,16 @@ final class Version20201114235409 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', "Migration can only be executed safely  on \'SQLite\'");
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE medico (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, crm INTEGER NOT NULL, nome VARCHAR(255) NOT NULL)');
     }
 
     public function down(Schema $schema): void
     {
+        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', "Migration can only be executed safely  on \'SQLite\'");
+
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('DROP TABLE medico');
     }

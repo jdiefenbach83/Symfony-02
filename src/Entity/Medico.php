@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * @ORM\Entity()
  */
@@ -12,7 +14,7 @@ class Medico
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    public int $id;
+    public ?int $id;
     /**
      * @ORM\Column(type="integer")
      */
