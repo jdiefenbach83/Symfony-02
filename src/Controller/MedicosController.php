@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Medico;
 use App\Helper\MedicoFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -88,8 +89,9 @@ class MedicosController extends AbstractController
             return new Response('', Response::HTTP_NOT_FOUND);
         }
 
-        $medicoExistente->crm = $medicoEnviado->crm;
-        $medicoExistente->nome = $medicoEnviado->nome;
+        $medicoExistente
+            ->setCrm($medicoEnviado->getCrm())
+            ->setNome($medicoEnviado->getNome());
 
         $this->entityManager->flush();
 
@@ -110,6 +112,7 @@ class MedicosController extends AbstractController
      * @Route("/medicos/{id}", methods={"DELETE"})
      * @param int $id
      * @return Response
+     * @throws ORMException
      */
     public function remove(int $id): Response
     {
