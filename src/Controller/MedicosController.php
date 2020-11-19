@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Medico;
 use App\Helper\MedicoFactory;
+use App\Repository\MedicosRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,11 +23,16 @@ class MedicosController extends AbstractController
      * @var MedicoFactory
      */
     private MedicoFactory $medicoFactory;
+    /**
+     * @var MedicosRepository
+     */
+    private MedicosRepository $medicosRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $medicoFactory)
+    public function __construct(EntityManagerInterface $entityManager, MedicoFactory $medicoFactory, MedicosRepository $medicosRepository)
     {
         $this->entityManager = $entityManager;
         $this->medicoFactory = $medicoFactory;
+        $this->medicosRepository = $medicosRepository;
     }
 
     /**
@@ -51,8 +57,7 @@ class MedicosController extends AbstractController
      */
     public function buscarTodos(): Response
     {
-        $medicoRepository = $this->getDoctrine()->getRepository(Medico::class);
-        $medicos = $medicoRepository->findAll();
+        $medicos = $this->medicosRepository->findAll();
 
         return new JsonResponse($medicos);
     }
@@ -104,8 +109,7 @@ class MedicosController extends AbstractController
      */
     private function buscaMedico(int $id)
     {
-        $medicoRepository = $this->getDoctrine()->getRepository(Medico::class);
-        return $medicoRepository->find($id);
+        return $this->medicosRepository->find($id);
     }
 
     /**
@@ -122,5 +126,17 @@ class MedicosController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse('', Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Route("/especialidades/{especialidadeId}/medicos", methods={"GET"})
+     * @param int $especialidadeId
+     * @return Response
+     */
+    public function buscarPorEspecialidade(int $especialidadeId): Response
+    {
+        $medicos = $this->medicosRepository->findBy(['especialidade' => $especialidadeId]);
+
+        return new JsonResponse($medicos);
     }
 }
