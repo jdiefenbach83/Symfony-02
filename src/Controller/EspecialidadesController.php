@@ -7,6 +7,7 @@ use App\Helper\EspecialidadeFactory;
 use App\Helper\ExtratorDadosRequest;
 use App\Repository\EspecialidadeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 
 class EspecialidadesController extends BaseController
 {
@@ -22,12 +23,20 @@ class EspecialidadesController extends BaseController
     }
 
     /**
-     * @param Especialidade $entidadeExistente
-     * @param Especialidade $entidadeEnviada
+     * @param int $id
+     * @param $entidade
+     * @return Especialidade
      */
-    protected function atualizarEntidadeExistente($entidadeExistente, $entidadeEnviada)
+    public function atualizaEntidadeExistente(int $id, $entidade)
     {
-        $entidadeExistente
-            ->setDescricao($entidadeEnviada->getDescricao());
+        /** @var Especialidade $entidadeExistente */
+        $entidadeExistente = $this->repository->find($id);
+        if (is_null($entidadeExistente)) {
+            throw new InvalidArgumentException();
+        }
+        $entidadeExistente->setDescricao($entidade->getDescricao());
+
+        return $entidadeExistente;
     }
+
 }

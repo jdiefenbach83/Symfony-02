@@ -7,6 +7,7 @@ use App\Helper\ExtratorDadosRequest;
 use App\Helper\MedicoFactory;
 use App\Repository\MedicosRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,16 +25,24 @@ class MedicosController extends BaseController
     }
 
     /**
-     * @param Medico $entidadeExistente
-     * @param Medico $entidadeEnviada
+     * @param int $id
+     * @param $entidade
+     * @return Medico
      */
-    protected function atualizarEntidadeExistente($entidadeExistente, $entidadeEnviada)
+    public function atualizaEntidadeExistente(int $id, $entidade)
     {
+        /** @var Medico $entidadeExistente */
+        $entidadeExistente = $this->repository->find($id);
+        if (is_null($entidadeExistente)) {
+            throw new InvalidArgumentException();
+        }
         $entidadeExistente
-            ->setCrm($entidadeEnviada->getCrm())
-            ->setNome($entidadeEnviada->getNome())
-            ->setEspecialidade($entidadeEnviada->getEspecialidade());
+            ->setCrm($entidade->getCrm())
+            ->setNome($entidade->getNome());
+
+        return $entidadeExistente;
     }
+
 
     public function buscarPorEspecialidade(int $especialidadeId): Response
     {

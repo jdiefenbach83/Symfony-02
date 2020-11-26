@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Helper\EntidadeFactory;
 use App\Helper\ExtratorDadosRequest;
+use App\Helper\ResponseFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,12 +67,30 @@ abstract class BaseController extends AbstractController
 
         $entityList = $this->repository->findBy($filtro, $ordenacao, $itensPorPagina, ($paginaAtual - 1) * $itensPorPagina);
 
-        return new JsonResponse($entityList);
+        $fabricaResposta = new ResponseFactory(
+            true,
+            $entityList,
+            Response::HTTP_OK,
+            $paginaAtual,
+            $itensPorPagina
+        );
+        return $fabricaResposta->getResponse();
     }
 
     public function buscarUm(int $id): Response
     {
-        return new JsonResponse($this->repository->find($id));
+        $entity = $this->repository->find($id);
+        $status = is_null($entity) ? Response::HTTP_NO_CONTENT : Response::HTTP_OK;
+
+        $fabricaResposta = new ResponseFactory(
+            true,
+            $entity,
+            $status,
+            null,
+            null
+        );
+
+        return $fabricaResposta->getResponse();
     }
 
     public function novo(Request $request): Response
@@ -87,22 +107,31 @@ abstract class BaseController extends AbstractController
     public function atualiza(int $id, Request $request): Response
     {
         $corpoRequisicao = $request->getContent();
-        $entidadeEnviada = $this->factory->criarEntidade($corpoRequisicao);
+        $entidade = $this->factory->criarEntidade($corpoRequisicao);
 
-        $entidadeExistente = $this->repository->find($id);
+        try {
+            $entidadeExistente = $this->atualizaEntidadeExistente($id, $entidade);
+            $this->entityManager->flush();
 
-        if (is_null($entidadeExistente)) {
-            return new Response('', Response::HTTP_NOT_FOUND);
+            $fabricaResposta = new ResponseFactory(
+                true,
+                $entidadeExistente,
+                Response::HTTP_OK,
+
+            );
+
+            return $fabricaResposta->getResponse();
+        } catch (InvalidArgumentException $ex) {
+            $fabricaResposta = new ResponseFactory(
+                false,
+                'Recurso não encontrado',
+                Response::HTTP_NOT_FOUND,
+
+            );
+
+            return $fabricaResposta->getResponse();
         }
-
-        $this->atualizarEntidadeExistente($entidadeExistente, $entidadeEnviada);
-
-        $this->entityManager->flush();
-
-        return new JsonResponse($entidadeExistente);
     }
-
-    protected abstract function atualizarEntidadeExistente($entidadeExistente, $entidadeEnviada);
 
     public function remove(int $id): Response
     {
