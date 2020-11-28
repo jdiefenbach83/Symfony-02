@@ -2,59 +2,65 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 
+login:
+  path: /login
+  controller: App\Controller\LoginController::index
+  methods:
+    - POST
+
 especialidades:
   path: /especialidades
-  controller: App\Controller\EspecialidadesController:buscarTodos
+  controller: App\Controller\EspecialidadesController::buscarTodos
   methods:
     - GET
 especialidade:
   path: /especialidades/{id}
-  controller: App\Controller\EspecialidadesController:buscarUm
+  controller: App\Controller\EspecialidadesController::buscarUm
   methods:
     - GET
 remove_especialidade:
   path: /especialidades/{id}
-  controller: App\Controller\EspecialidadesController:remove
+  controller: App\Controller\EspecialidadesController::remove
   methods:
     - DELETE
 cria_especialidade:
   path: /especialidades
-  controller: App\Controller\EspecialidadesController:novo
+  controller: App\Controller\EspecialidadesController::novo
   methods:
     - POST
 atualiza_especialidade:
   path: /especialidades/{id}
-  controller: App\Controller\EspecialidadesController:atualiza
+  controller: App\Controller\EspecialidadesController::atualiza
   methods:
     - PUT
 
 medicos:
   path: /medicos
-  controller: App\Controller\MedicosController:buscarTodos
+  controller: App\Controller\MedicosController::buscarTodos
   methods:
     - GET
 medico:
   path: /medicos/{id}
-  controller: App\Controller\MedicosController:buscarUm
+  controller: App\Controller\MedicosController::buscarUm
   methods:
     - GET
 remove_medico:
   path: /medicos/{id}
-  controller: App\Controller\MedicosController:remove
+  controller: App\Controller\MedicosController::remove
   methods:
     - DELETE
 cria_medico:
   path: /medicos
-  controller: App\Controller\MedicosController:novo
+  controller: App\Controller\MedicosController::novo
   methods:
     - POST
 atualiza_medico:
   path: /medicos/{id}
-  controller: App\Controller\MedicosController:atualiza
+  controller: App\Controller\MedicosController::atualiza
   methods:
     - PUT
 medicos_por_especialidade:
   path: /especialidades/{especialidadeId}/medicos
-  controller: App\Controller\MedicosController:buscarPorEspecialidade
+  controller: App\Controller\MedicosController::buscarPorEspecialidade
   methods:
     - GET
